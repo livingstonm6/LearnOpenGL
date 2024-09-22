@@ -82,6 +82,8 @@ int main()
 
     Shader shaderProgram("VertexShader.vs", "FragmentShader.fs");
 
+    float offset = 0.25f;
+
     while (!glfwWindowShouldClose(window)) {
         process_input(window);
 
@@ -89,6 +91,8 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         shaderProgram.use();
+        shaderProgram.setFloat("offset", offset);
+
         glBindVertexArray(vertexArrayObject);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
