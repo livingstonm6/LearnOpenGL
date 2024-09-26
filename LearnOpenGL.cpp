@@ -6,6 +6,8 @@
 #include <GLFW/glfw3.h>
 #include "Shader.h"
 
+#include "images.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
@@ -42,16 +44,29 @@ int main()
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
 
+    //float vertices[] = {
+    //    // positions         // colours
+    //    0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,
+    //   -0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
+    //    0.0f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f
+    //};
+
+    //unsigned int indices[] = {
+    //    0, 4, 1,
+    //    4, 3, 2
+    //};
+
     float vertices[] = {
-        // positions         // colours
-        0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,
-       -0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
-        0.0f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f
+        // positions           // colors            // texture coords
+         0.5f,  0.5f, 0.0f,    1.0f, 0.0f, 0.0f,    1.0f, 1.0f, // top r
+         0.5f, -0.5f, 0.0f,    0.0f, 1.0f, 0.0f,    1.0f, 0.0f, // bottomn r
+        -0.5f, -0.5f, 0.0f,    0.0f, 0.0f, 1.0f,    0.0f, 0.0f, // bottom l
+        -0.5f,  0.5f, 0.0f,    1.0f, 1.0f, 0.0f,    0.0f, 1.0f // top l
     };
 
     unsigned int indices[] = {
-        0, 4, 1,
-        4, 3, 2
+        0, 1, 2,
+        0, 3, 2
     };
 
     // VAO setup
@@ -74,15 +89,46 @@ int main()
 
     // tell Opengl how to interpret vertex data
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     Shader shaderProgram("VertexShader.vs", "FragmentShader.fs");
 
     float offset = 0.25f;
+    
+    // load image for texture
+
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+
+    // create texture
+
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    // set texture wrapping/filtering options
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    if (data) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+
+    stbi_image_free(data);
+
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window);
@@ -93,8 +139,10 @@ int main()
         shaderProgram.use();
         shaderProgram.setFloat("offset", offset);
 
+        glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(vertexArrayObject);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
 
