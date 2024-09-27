@@ -8,6 +8,8 @@
 
 #include "images.h"
 
+float mixConstant = 0.2;
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
@@ -15,6 +17,12 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void process_input(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
+    }
+    else if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        mixConstant += 0.001;
+    }
+    else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        mixConstant -= 0.001;
     }
 }
 
@@ -58,10 +66,10 @@ int main()
 
     float vertices[] = {
         // positions           // colors            // texture coords
-         0.5f,  0.5f, 0.0f,    1.0f, 0.0f, 0.0f,    1.0f, 1.0f, // top r
-         0.5f, -0.5f, 0.0f,    0.0f, 1.0f, 0.0f,    1.0f, 0.0f, // bottomn r
+         0.5f,  0.5f, 0.0f,    1.0f, 0.0f, 0.0f,    2.0f, 2.0f, // top r
+         0.5f, -0.5f, 0.0f,    0.0f, 1.0f, 0.0f,    2.0f, 0.0f, // bottomn r
         -0.5f, -0.5f, 0.0f,    0.0f, 0.0f, 1.0f,    0.0f, 0.0f, // bottom l
-        -0.5f,  0.5f, 0.0f,    1.0f, 1.0f, 0.0f,    0.0f, 1.0f // top l
+        -0.5f,  0.5f, 0.0f,    1.0f, 1.0f, 0.0f,    0.0f, 2.0f // top l
     };
 
     unsigned int indices[] = {
@@ -109,9 +117,11 @@ int main()
 
     // create texture
 
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    stbi_set_flip_vertically_on_load(true);
+
+    unsigned int texture1;
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
 
     // set texture wrapping/filtering options
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -124,24 +134,42 @@ int main()
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else {
-        std::cout << "Failed to load texture" << std::endl;
+        std::cout << "Failed to load texture 1" << std::endl;
     }
 
     stbi_image_free(data);
 
+    unsigned int texture2;
+    glGenTextures(1, &texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    
+    data = nullptr;
+    data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
+    if (data) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else {
+        std::cout << "Failed to load texture 2" << std::endl;
+    }
+
+    shaderProgram.use();
+    shaderProgram.setInt("texture1", 0);
+    shaderProgram.setInt("texture2", 1);
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window);
-
+        shaderProgram.setFloat("mixConstant", mixConstant);
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        shaderProgram.use();
-        shaderProgram.setFloat("offset", offset);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
 
-        glBindTexture(GL_TEXTURE_2D, texture);
+
         glBindVertexArray(vertexArrayObject);
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);

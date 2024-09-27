@@ -154,6 +154,7 @@
     <Text Include="stb_image_LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="awesomeface.png" />
     <Image Include="container.jpg" />
     <Image Include="wall.jpg" />
   </ItemGroup>
