@@ -5,7 +5,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "Shader.h"
-
 #include "images.h"
 
 float mixConstant = 0.2;
@@ -51,19 +50,6 @@ int main()
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-
-    //float vertices[] = {
-    //    // positions         // colours
-    //    0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,
-    //   -0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
-    //    0.0f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f
-    //};
-
-    //unsigned int indices[] = {
-    //    0, 4, 1,
-    //    4, 3, 2
-    //};
-
     float vertices[] = {
         // positions           // colors            // texture coords
          0.5f,  0.5f, 0.0f,    1.0f, 0.0f, 0.0f,    2.0f, 2.0f, // top r
@@ -107,8 +93,6 @@ int main()
     glEnableVertexAttribArray(2);
 
     Shader shaderProgram("VertexShader.vs", "FragmentShader.fs");
-
-    float offset = 0.25f;
     
     // load image for texture
 
