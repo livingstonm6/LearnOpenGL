@@ -6,6 +6,9 @@
 #include <GLFW/glfw3.h>
 #include "Shader.h"
 #include "images.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 float mixConstant = 0.2;
 
@@ -141,9 +144,19 @@ int main()
     shaderProgram.setInt("texture1", 0);
     shaderProgram.setInt("texture2", 1);
 
+    unsigned int transformLoc = glGetUniformLocation(shaderProgram.id, "transform");
+    
+
     while (!glfwWindowShouldClose(window)) {
         process_input(window);
         shaderProgram.setFloat("mixConstant", mixConstant);
+
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+
+
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
         glClear(GL_COLOR_BUFFER_BIT);
 
