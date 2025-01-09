@@ -71,12 +71,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\turbo\Downloads\glad\include;C:\Users\turbo\Downloads\glfw-3.4\glfw-3.4\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\turbo\Downloads\glfw-3.4\build2\src\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\turbo\Downloads\glm-1.0.1\glm-1.0.1;C:\Users\turbo\Downloads\glad\include;C:\Users\turbo\Downloads\glfw-3.4\glfw-3.4\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\turbo\Downloads\glfw-3.4\glfw-3.4\build\src\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\turbo\Downloads\glad\include;C:\Users\turbo\Downloads\glfw-3.4\glfw-3.4\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\turbo\Downloads\glfw-3.4\build2\src\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\turbo\Downloads\glm-1.0.1\glm-1.0.1;C:\Users\turbo\Downloads\glad\include;C:\Users\turbo\Downloads\glfw-3.4\glfw-3.4\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\turbo\Downloads\glfw-3.4\glfw-3.4\build\src\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -137,7 +137,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Downloads\glad\src\glad.c" />
+    <ClCompile Include="..\..\..\..\Downloads\glad\src\glad.c" />
     <ClCompile Include="LearnOpenGL.cpp" />
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
