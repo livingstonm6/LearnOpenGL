@@ -10,7 +10,13 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
 float mixConstant = 0.2;
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
@@ -25,6 +31,21 @@ void process_input(GLFWwindow* window) {
     }
     else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
         mixConstant -= 0.001;
+    }
+
+    const float cameraSpeed = 2.5f * deltaTime;
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        cameraPos += cameraSpeed * cameraFront;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        cameraPos -= cameraSpeed * cameraFront;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     }
 }
 
@@ -185,15 +206,16 @@ int main()
     shaderProgram.setInt("texture1", 0);
     shaderProgram.setInt("texture2", 1);
 
-    glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 projection = glm::mat4(1.0f);
-
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-    projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-    shaderProgram.setMat4("view", glm::value_ptr(view));
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
     shaderProgram.setMat4("projection", glm::value_ptr(projection));
 
+    const float radius = 10.0f;
+
     while (!glfwWindowShouldClose(window)) {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         process_input(window);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -205,6 +227,9 @@ int main()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
+        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
+        shaderProgram.setMat4("view", glm::value_ptr(view));
         shaderProgram.setFloat("mixConstant", mixConstant);
 
         for (unsigned int i = 0; i < 10; i++) {
